@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Button } from './Button';
 
@@ -29,30 +30,38 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto no-print">
-      <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onClick={onClose} />
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] overflow-y-auto no-print">
+      {/* Backdrop overlay */}
+      <div
+        className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-md transform rounded-2xl bg-white border border-slate-200 p-6 text-left shadow-2xl transition-all">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-            <h3 className="text-lg font-bold text-slate-900 tracking-tight">{title}</h3>
+      {/* Modal Container */}
+      <div className="flex min-h-full items-center justify-center p-4 sm:p-6 text-center">
+        <div className="relative w-full max-w-lg transform rounded-2xl bg-white border border-slate-200 p-6 text-left shadow-2xl transition-all my-8 z-[10000]">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3.5 mb-4">
+            <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">{title}</h3>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full"
+              className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full shrink-0"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
             </Button>
           </div>
 
-          <div className="py-2 text-slate-800">{children}</div>
+          <div className="py-2 text-slate-800 max-h-[70vh] overflow-y-auto pr-1">{children}</div>
 
           {footer && <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-4">{footer}</div>}
         </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
