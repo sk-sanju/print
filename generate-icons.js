@@ -1,0 +1,20 @@
+import fs from 'fs';
+import path from 'path';
+
+// Create SVG icons for PWA
+const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="100" fill="#0f172a"/>
+  <path d="M128 384H85.3333C74.0174 384 65.1768 375.159 65.1768 363.843V257.503C65.1768 246.187 74.0174 237.347 85.3333 237.347H426.667C437.983 237.347 446.823 246.187 446.823 257.503V363.843C446.823 375.159 437.983 384 426.667 384H384" stroke="#38bdf8" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 237.347V128C128 116.684 136.841 107.843 148.157 107.843H363.843C375.159 107.843 384 116.684 384 128V237.347" stroke="#38bdf8" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="128" y="316" width="256" height="140" rx="16" fill="#0f172a" stroke="#38bdf8" stroke-width="32"/>
+</svg>`;
+
+const publicDir = path.resolve('public');
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
+}
+
+fs.writeFileSync(path.join(publicDir, 'masked-icon.svg'), svgContent);
+fs.writeFileSync(path.join(publicDir, 'apple-touch-icon.svg'), svgContent);
+
+console.log('SVG icons generated in public/');
