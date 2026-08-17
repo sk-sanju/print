@@ -3,6 +3,7 @@ import { Dashboard } from '../pages/Dashboard/Dashboard';
 import { NewForm } from '../pages/NewForm/NewForm';
 import { Preview } from '../pages/Preview/Preview';
 import { SavedForms } from '../pages/SavedForms/SavedForms';
+import { BulkPrint } from '../pages/BulkPrint/BulkPrint';
 
 interface AppRoutesProps {
   currentRoute: string;
@@ -20,6 +21,8 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ currentRoute, routeParams,
       return <Preview id={routeParams.id} refNo={routeParams.ref} autoPrint={routeParams.autoPrint} onNavigate={onNavigate} />;
     case 'saved-forms':
       return <SavedForms onNavigate={onNavigate} />;
+    case 'bulk-print':
+      return <BulkPrint ids={routeParams.ids} onNavigate={onNavigate} />;
     default:
       return <Dashboard onNavigate={onNavigate} />;
   }

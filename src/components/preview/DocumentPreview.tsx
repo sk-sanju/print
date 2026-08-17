@@ -7,9 +7,15 @@ import { Edit2, MapPin } from 'lucide-react';
 
 interface DocumentPreviewProps {
   record: AddressRecord;
+  slotPosition?: 1 | 2 | 3;
+  additionalRecords?: (AddressRecord | null)[];
 }
 
-export const DocumentPreview: React.FC<DocumentPreviewProps> = ({ record }) => {
+export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
+  record,
+  slotPosition = 1,
+  additionalRecords = [],
+}) => {
   const [fromAddress, setFromAddress] = useState<FromAddress | null>(null);
   const [isFromModalOpen, setIsFromModalOpen] = useState<boolean>(false);
 
@@ -18,22 +24,94 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({ record }) => {
     setFromAddress(loaded);
   }, []);
 
-  // Format Delivery Address Lines cleanly
-  const deliveryAddressLines: string[] = [];
-  const line1 = [record.houseName, record.houseNumber, record.street].filter(Boolean).join(', ');
-  if (line1) deliveryAddressLines.push(line1);
+  const renderSingleLabelCard = (rec: AddressRecord, slotIndex: number) => {
+    const deliveryAddressLines: string[] = [];
+    const line1 = [rec.houseName, rec.houseNumber, rec.street].filter(Boolean).join(', ');
+    if (line1) deliveryAddressLines.push(line1);
 
-  const line2 = [record.locality, record.landmark].filter(Boolean).join(', ');
-  if (line2) deliveryAddressLines.push(line2);
+    const line2 = [rec.locality, rec.landmark].filter(Boolean).join(', ');
+    if (line2) deliveryAddressLines.push(line2);
 
-  const cityStatePin = [
-    record.city,
-    record.state,
-    record.pinCode ? record.pinCode : '',
-  ]
-    .filter(Boolean)
-    .join(' – ');
-  if (cityStatePin) deliveryAddressLines.push(cityStatePin);
+    const cityStatePin = [
+      rec.city,
+      rec.state,
+      rec.pinCode ? rec.pinCode : '',
+    ]
+      .filter(Boolean)
+      .join(' – ');
+    if (cityStatePin) deliveryAddressLines.push(cityStatePin);
+
+    return (
+      <div
+        key={`${rec.id || 'rec'}-${slotIndex}`}
+        className="bg-white text-slate-950 border border-slate-300 shadow-md sm:shadow-lg mx-auto p-3.5 sm:p-5 max-w-2xl rounded-lg sm:rounded-md print:max-w-none print:shadow-none print:border-slate-800 print:border-2 print:p-4 print:bg-white font-sans print-avoid-break mb-3 last:mb-0"
+      >
+        {/* Ref Tag top right */}
+        <div className="flex flex-row justify-between items-center mb-2 pb-1.5 border-b border-slate-200 print:border-slate-300">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+            Courier Shipping Label (Slot {slotIndex})
+          </span>
+          <span className="text-xs font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded print:bg-transparent print:p-0">
+            {rec.referenceNumber}
+          </span>
+        </div>
+
+        {/* TO / DELIVERY ADDRESS BLOCK */}
+        <div className="mb-3 pb-3 border-b-2 border-slate-300">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mb-1 break-words">
+            {rec.customerName}
+          </h2>
+
+          <div className="text-xs sm:text-sm font-semibold text-slate-800 space-y-0.5 leading-snug break-words">
+            {deliveryAddressLines.map((line, idx) => (
+              <p key={idx}>{line}</p>
+            ))}
+          </div>
+
+          <div className="mt-2 text-xs sm:text-sm font-bold text-slate-900 font-mono break-all">
+            Mobile: {rec.mobileNumber}
+            {rec.alternateMobile && <span className="block sm:inline sm:ml-3">/ {rec.alternateMobile}</span>}
+          </div>
+        </div>
+
+        {/* FROM / SENDER ADDRESS BLOCK */}
+        <div>
+          {fromAddress ? (
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight mb-0.5 break-words">
+                {fromAddress.name}
+              </h3>
+              <div className="text-xs sm:text-sm font-semibold text-slate-800 space-y-0.5 leading-snug break-words">
+                <p>{fromAddress.addressLine1}</p>
+                {fromAddress.addressLine2 && <p>{fromAddress.addressLine2}</p>}
+                <p>
+                  {[fromAddress.city, fromAddress.state, fromAddress.pinCode]
+                    .filter(Boolean)
+                    .join(' – ')}
+                </p>
+              </div>
+              <div className="mt-1.5 text-xs sm:text-sm font-bold text-slate-900 font-mono break-all">
+                Mobile: {fromAddress.mobileNumber}
+              </div>
+            </div>
+          ) : (
+            <div className="p-2.5 bg-slate-50 border border-dashed border-slate-300 rounded text-center">
+              <p className="text-xs font-medium text-slate-600">
+                Sender address not set yet.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Remarks / Delivery Note if any */}
+        {rec.remarks && (
+          <div className="mt-2.5 pt-2 border-t border-slate-200 text-[11px] font-semibold text-slate-700 italic break-words">
+            Note: {rec.remarks}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -62,82 +140,43 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({ record }) => {
         </Button>
       </div>
 
-      {/* Actual Print / Courier Slip Card - Pure White Background */}
+      {/* Main Printable Document Sheet Container - 3 Labels on 1 A4 Page */}
       <div
         id="printable-document"
-        className="bg-white text-slate-950 border border-slate-300 shadow-md sm:shadow-lg mx-auto p-4 sm:p-8 md:p-10 max-w-2xl rounded-lg sm:rounded-md print:max-w-none print:shadow-none print:border-none print:p-0 print:bg-transparent font-sans"
+        className="max-w-2xl mx-auto space-y-3 print:space-y-2 print:max-w-none print:p-0 print:m-0"
       >
-        {/* Subtle Ref Tag top right */}
-        <div className="flex flex-row justify-between items-center mb-4 sm:mb-6 pb-2 border-b border-slate-200 print:border-none">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">
-            Courier Shipping Label
-          </span>
-          <span className="text-xs sm:text-sm font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded print:bg-transparent print:p-0">
-            {record.referenceNumber}
-          </span>
-        </div>
-
-        {/* TO / DELIVERY ADDRESS BLOCK (Without heading title) */}
-        <div className="mb-6 pb-6 border-b-2 border-slate-300">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-2 break-words">
-            {record.customerName}
-          </h2>
-
-          <div className="text-sm sm:text-base font-semibold text-slate-800 space-y-1 leading-snug break-words">
-            {deliveryAddressLines.map((line, idx) => (
-              <p key={idx}>{line}</p>
-            ))}
-          </div>
-
-          <div className="mt-3 text-sm sm:text-base font-bold text-slate-900 font-mono break-all">
-            Mobile: {record.mobileNumber}
-            {record.alternateMobile && <span className="block sm:inline sm:ml-3">/ {record.alternateMobile}</span>}
-          </div>
-        </div>
-
-        {/* FROM / SENDER ADDRESS BLOCK (Without heading title) */}
-        <div>
-          {fromAddress ? (
-            <div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mb-1.5 break-words">
-                {fromAddress.name}
-              </h3>
-              <div className="text-sm sm:text-base font-semibold text-slate-800 space-y-1 leading-snug break-words">
-                <p>{fromAddress.addressLine1}</p>
-                {fromAddress.addressLine2 && <p>{fromAddress.addressLine2}</p>}
-                <p>
-                  {[fromAddress.city, fromAddress.state, fromAddress.pinCode]
-                    .filter(Boolean)
-                    .join(' – ')}
-                </p>
-              </div>
-              <div className="mt-3 text-sm sm:text-base font-bold text-slate-900 font-mono break-all">
-                Mobile: {fromAddress.mobileNumber}
-              </div>
-            </div>
-          ) : (
-            <div className="p-4 bg-slate-50 border border-dashed border-slate-300 rounded text-center">
-              <p className="text-xs sm:text-sm font-medium text-slate-600">
-                Sender address not set yet.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2 no-print w-full sm:w-auto"
-                onClick={() => setIsFromModalOpen(true)}
-              >
-                + Set From Address
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Remarks / Delivery Note if any */}
-        {record.remarks && (
-          <div className="mt-6 pt-4 border-t border-slate-200 text-xs font-semibold text-slate-700 italic break-words">
-            Note: {record.remarks}
+        {/* Spacer for Slot 1 if starting at Slot 2 or Slot 3 */}
+        {slotPosition >= 2 && (
+          <div className="h-[250px] border-2 border-dashed border-slate-300/60 rounded-md flex items-center justify-center text-slate-400 text-xs font-mono no-print">
+            [ Slot 1 Empty Spacer - Paper Saved / Used Sticker ]
           </div>
         )}
+
+        {/* Spacer for Slot 2 if starting at Slot 3 */}
+        {slotPosition === 3 && (
+          <div className="h-[250px] border-2 border-dashed border-slate-300/60 rounded-md flex items-center justify-center text-slate-400 text-xs font-mono no-print">
+            [ Slot 2 Empty Spacer - Paper Saved / Used Sticker ]
+          </div>
+        )}
+
+        {/* Printable spacers in @media print */}
+        {slotPosition >= 2 && (
+          <div className="hidden print:block h-[250px] w-full" aria-hidden="true" />
+        )}
+        {slotPosition === 3 && (
+          <div className="hidden print:block h-[250px] w-full" aria-hidden="true" />
+        )}
+
+        {/* Render Primary Record in Selected Slot Position */}
+        {renderSingleLabelCard(record, slotPosition)}
+
+        {/* Render Additional Records if stacked on same page */}
+        {additionalRecords.map((addRec, idx) => {
+          if (!addRec) return null;
+          const nextSlot = slotPosition + idx + 1;
+          if (nextSlot > 3) return null;
+          return renderSingleLabelCard(addRec, nextSlot);
+        })}
       </div>
 
       {/* From Address Settings Modal */}

@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { formatDate } from '../../utils/date.utils';
-import { Search, Eye, Edit2, Printer, Trash2, ArrowLeft, PlusCircle, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Eye, Edit2, Printer, Trash2, ArrowLeft, PlusCircle, AlertTriangle, ChevronLeft, ChevronRight, CheckSquare, Square, Layers } from 'lucide-react';
 
 interface SavedFormsProps {
   onNavigate: (route: string, params?: Record<string, any>) => void;
@@ -27,6 +27,9 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Bulk Selection state
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // Delete modal state
   const [deletingRecord, setDeletingRecord] = useState<AddressRecord | null>(null);
@@ -56,11 +59,33 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setPage(1);
+    setSelectedIds([]);
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value as any);
     setPage(1);
+    setSelectedIds([]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === result.data.length && result.data.length > 0) {
+      setSelectedIds([]);
+    } else {
+      const allIds = result.data.map((r) => r.id!).filter(Boolean);
+      setSelectedIds(allIds);
+    }
+  };
+
+  const toggleSelectRecord = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkPrint = () => {
+    if (selectedIds.length === 0) return;
+    onNavigate('bulk-print', { ids: selectedIds });
   };
 
   const handleDeleteConfirm = async () => {
@@ -69,6 +94,7 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
       setIsDeleting(true);
       await FormService.deleteForm(deletingRecord.id);
       setDeletingRecord(null);
+      setSelectedIds((prev) => prev.filter((id) => id !== deletingRecord.id));
       await fetchForms();
     } catch (err) {
       console.error('Failed to delete record:', err);
@@ -77,6 +103,8 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
       setIsDeleting(false);
     }
   };
+
+  const isAllSelected = result.data.length > 0 && selectedIds.length === result.data.length;
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -94,22 +122,24 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Saved Forms</h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Search, reprint, edit, or remove customer address records
+              Search, bulk print, edit, or remove customer address records
             </p>
           </div>
         </div>
 
-        <Button
-          variant="primary"
-          icon={<PlusCircle className="w-4 h-4" />}
-          onClick={() => onNavigate('new-form')}
-          className="w-full sm:w-auto justify-center"
-        >
-          + New Address
-        </Button>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Button
+            variant="primary"
+            icon={<PlusCircle className="w-4 h-4" />}
+            onClick={() => onNavigate('new-form')}
+            className="w-full sm:w-auto justify-center"
+          >
+            + New Address
+          </Button>
+        </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Filter, Search, and Bulk Selection Bar */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
         <div className="w-full sm:w-80">
           <Input
@@ -137,6 +167,37 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* Bulk Print Action Floating Bar */}
+      {selectedIds.length > 0 && (
+        <div className="bg-indigo-600 text-white p-3.5 px-5 rounded-xl shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 animate-fade-in no-print">
+          <div className="flex items-center gap-2 font-semibold text-sm">
+            <Layers className="w-5 h-5 text-indigo-200" />
+            <span>{selectedIds.length} Address Label(s) Selected for Bulk Stack Printing</span>
+          </div>
+
+          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedIds([])}
+              className="bg-indigo-700 text-indigo-100 border-indigo-500 hover:bg-indigo-800"
+            >
+              Clear Selection
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleBulkPrint}
+              icon={<Printer className="w-4 h-4" />}
+              className="bg-white text-indigo-900 hover:bg-slate-100 font-bold shadow-md"
+            >
+              Bulk Print Stack ({selectedIds.length})
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Data Section */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         {isLoading ? (
@@ -157,6 +218,19 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
               <table className="w-full text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200">
                   <tr>
+                    <th className="px-4 py-3 w-10">
+                      <button
+                        onClick={toggleSelectAll}
+                        className="text-slate-500 hover:text-slate-800 p-1"
+                        title={isAllSelected ? 'Deselect All' : 'Select All'}
+                      >
+                        {isAllSelected ? (
+                          <CheckSquare className="w-4 h-4 text-indigo-600" />
+                        ) : (
+                          <Square className="w-4 h-4 text-slate-400" />
+                        )}
+                      </button>
+                    </th>
                     <th className="px-4 py-3">Reference No</th>
                     <th className="px-4 py-3">Customer Name</th>
                     <th className="px-4 py-3">Mobile Number</th>
@@ -166,119 +240,157 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
-                  {result.data.map((record) => (
-                    <tr key={record.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="px-4 py-3 font-mono font-semibold text-slate-900">
-                        <Badge variant="blue">{record.referenceNumber}</Badge>
-                      </td>
-                      <td className="px-4 py-3 font-medium text-slate-900">{record.customerName}</td>
-                      <td className="px-4 py-3 font-mono text-slate-600">{record.mobileNumber}</td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {record.city ? `${record.city} (${record.pinCode})` : record.pinCode}
-                      </td>
-                      <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">
-                        {formatDate(record.createdAt)}
-                      </td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onNavigate('preview', { id: record.id })}
-                            icon={<Eye className="w-3.5 h-3.5" />}
-                            title="Preview"
+                  {result.data.map((record) => {
+                    const isSelected = selectedIds.includes(record.id!);
+                    return (
+                      <tr
+                        key={record.id}
+                        className={`transition-colors ${
+                          isSelected ? 'bg-indigo-50/60' : 'hover:bg-slate-50/90'
+                        }`}
+                      >
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => toggleSelectRecord(record.id!)}
+                            className="p-1"
                           >
-                            View
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onNavigate('new-form', { id: record.id })}
-                            icon={<Edit2 className="w-3.5 h-3.5" />}
-                            title="Edit"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => onNavigate('preview', { id: record.id, autoPrint: true })}
-                            icon={<Printer className="w-3.5 h-3.5" />}
-                          >
-                            Print
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeletingRecord(record)}
-                            icon={<Trash2 className="w-3.5 h-3.5" />}
-                            className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                            title="Delete"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            {isSelected ? (
+                              <CheckSquare className="w-4 h-4 text-indigo-600" />
+                            ) : (
+                              <Square className="w-4 h-4 text-slate-400 hover:text-slate-600" />
+                            )}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 font-mono font-semibold text-slate-900">
+                          <Badge variant="indigo">{record.referenceNumber}</Badge>
+                        </td>
+                        <td className="px-4 py-3 font-bold text-slate-900">{record.customerName}</td>
+                        <td className="px-4 py-3 font-mono text-slate-600">{record.mobileNumber}</td>
+                        <td className="px-4 py-3 text-slate-600">
+                          {record.city ? `${record.city} (${record.pinCode})` : record.pinCode}
+                        </td>
+                        <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">
+                          {formatDate(record.createdAt)}
+                        </td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onNavigate('preview', { id: record.id })}
+                              icon={<Eye className="w-3.5 h-3.5" />}
+                              title="Preview"
+                            >
+                              View
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onNavigate('new-form', { id: record.id })}
+                              icon={<Edit2 className="w-3.5 h-3.5" />}
+                              title="Edit"
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => onNavigate('preview', { id: record.id, autoPrint: true })}
+                              icon={<Printer className="w-3.5 h-3.5" />}
+                            >
+                              Print
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeletingRecord(record)}
+                              icon={<Trash2 className="w-3.5 h-3.5" />}
+                              className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                              title="Delete"
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile Touch Cards View (below sm) */}
             <div className="sm:hidden divide-y divide-slate-100">
-              {result.data.map((record) => (
-                <div key={record.id} className="p-4 space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <Badge variant="blue">{record.referenceNumber}</Badge>
-                    <span className="text-xs text-slate-400">{formatDate(record.createdAt)}</span>
-                  </div>
+              {result.data.map((record) => {
+                const isSelected = selectedIds.includes(record.id!);
+                return (
+                  <div
+                    key={record.id}
+                    className={`p-4 space-y-3 ${isSelected ? 'bg-indigo-50/40' : ''}`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleSelectRecord(record.id!)}
+                          className="p-1"
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="w-4 h-4 text-indigo-600" />
+                          ) : (
+                            <Square className="w-4 h-4 text-slate-400" />
+                          )}
+                        </button>
+                        <Badge variant="indigo">{record.referenceNumber}</Badge>
+                      </div>
+                      <span className="text-xs text-slate-400">{formatDate(record.createdAt)}</span>
+                    </div>
 
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-base">{record.customerName}</h4>
-                    <p className="text-xs text-slate-600 font-mono mt-0.5">Mobile: {record.mobileNumber}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {record.city ? `${record.city} – ${record.pinCode}` : record.pinCode}
-                    </p>
-                  </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-base">{record.customerName}</h4>
+                      <p className="text-xs text-slate-600 font-mono mt-0.5">Mobile: {record.mobileNumber}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {record.city ? `${record.city} – ${record.pinCode}` : record.pinCode}
+                      </p>
+                    </div>
 
-                  <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100 justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onNavigate('preview', { id: record.id })}
-                      icon={<Eye className="w-3.5 h-3.5" />}
-                    >
-                      View
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onNavigate('new-form', { id: record.id })}
-                      icon={<Edit2 className="w-3.5 h-3.5" />}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => onNavigate('preview', { id: record.id, autoPrint: true })}
-                      icon={<Printer className="w-3.5 h-3.5" />}
-                    >
-                      Print
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDeletingRecord(record)}
-                      icon={<Trash2 className="w-3.5 h-3.5" />}
-                      className="text-red-600 hover:bg-red-50"
-                    >
-                      Delete
-                    </Button>
+                    <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100 justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onNavigate('preview', { id: record.id })}
+                        icon={<Eye className="w-3.5 h-3.5" />}
+                      >
+                        View
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onNavigate('new-form', { id: record.id })}
+                        icon={<Edit2 className="w-3.5 h-3.5" />}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => onNavigate('preview', { id: record.id, autoPrint: true })}
+                        icon={<Printer className="w-3.5 h-3.5" />}
+                      >
+                        Print
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeletingRecord(record)}
+                        icon={<Trash2 className="w-3.5 h-3.5" />}
+                        className="text-red-600 hover:bg-red-50"
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
