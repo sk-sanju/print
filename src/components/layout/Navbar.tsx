@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Printer, PlusCircle, LayoutDashboard, Database, Download, MapPin, CheckCircle2 } from 'lucide-react';
+import { PlusCircle, LayoutDashboard, Database, Download, MapPin, CheckCircle2 } from 'lucide-react';
 import { NetworkBadge } from '../pwa/NetworkBadge';
 import { Button } from '../ui/Button';
 import { FromAddressModal } from '../forms/FromAddressModal';
@@ -34,12 +34,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
             className="flex items-center gap-3 cursor-pointer group"
             onClick={() => onNavigate('dashboard')}
           >
-            <div className="p-2.5 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-xl text-white shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform">
-              <Printer className="w-5 h-5" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="XenoPrint Logo"
+              className="w-9 h-9 rounded-xl shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform object-cover"
+            />
             <div>
-              <span className="font-extrabold text-base tracking-tight block leading-tight text-slate-900">
-                Address Print
+              <span className="font-black text-lg tracking-tight block leading-tight text-slate-900">
+                XenoPrint
               </span>
               <span className="text-[9px] font-bold uppercase tracking-widest text-indigo-600 font-mono block">
                 OFFLINE PWA

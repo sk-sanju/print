@@ -23,7 +23,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Download & Install Address Print App"
+      title="Download & Install XenoPrint App"
       footer={
         <Button variant="outline" onClick={onClose}>
           Close
@@ -36,9 +36,9 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
           <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
             <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
             <div>
-              <h4 className="font-bold text-emerald-900 text-sm">Application Already Installed!</h4>
+              <h4 className="font-bold text-emerald-900 text-sm">XenoPrint Already Installed!</h4>
               <p className="text-xs text-emerald-700 mt-0.5">
-                Address Print is running in desktop application mode with 100% offline support.
+                XenoPrint is running in desktop application mode with 100% offline support.
               </p>
             </div>
           </div>
@@ -64,7 +64,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
 
         {/* Benefits */}
         <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Why Install the PWA?</h4>
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Why Install XenoPrint?</h4>
           <ul className="text-xs space-y-1.5 text-slate-700">
             <li className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -92,7 +92,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
                 <span>Chrome / Edge on Desktop (Windows / Mac)</span>
               </div>
               <p className="text-slate-600 mt-1">
-                Click the <strong>Install / Download Icon</strong> (<span><Download className="w-3 h-3 inline" /></span>) on the right end of your browser's address bar, or click menu <strong>(⋮) &gt; Save and share &gt; Install Address Print</strong>.
+                Click the <strong>Install / Download Icon</strong> (<span><Download className="w-3 h-3 inline" /></span>) on the right end of your browser's address bar, or click menu <strong>(⋮) &gt; Save and share &gt; Install XenoPrint</strong>.
               </p>
             </div>
 

@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
           </button>
           <span className="flex items-center gap-1">
             <HardDrive className="w-3.5 h-3.5 text-slate-400" />
-            <span>v1.0.0</span>
+            <span>XenoPrint v1.0.0</span>
           </span>
         </div>
       </div>
