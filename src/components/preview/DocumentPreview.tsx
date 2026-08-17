@@ -62,26 +62,23 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({ record }) => {
         </Button>
       </div>
 
-      {/* Actual Print / Courier Slip Card */}
+      {/* Actual Print / Courier Slip Card - Pure White Background */}
       <div
         id="printable-document"
-        className="bg-[#fcf8f2] text-slate-950 border border-slate-300 shadow-md sm:shadow-lg mx-auto p-4 sm:p-8 md:p-10 max-w-2xl rounded-lg sm:rounded-md print:max-w-none print:shadow-none print:border-none print:p-0 print:bg-transparent font-sans"
+        className="bg-white text-slate-950 border border-slate-300 shadow-md sm:shadow-lg mx-auto p-4 sm:p-8 md:p-10 max-w-2xl rounded-lg sm:rounded-md print:max-w-none print:shadow-none print:border-none print:p-0 print:bg-transparent font-sans"
       >
         {/* Subtle Ref Tag top right */}
         <div className="flex flex-row justify-between items-center mb-4 sm:mb-6 pb-2 border-b border-slate-200 print:border-none">
           <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">
             Courier Shipping Label
           </span>
-          <span className="text-xs sm:text-sm font-mono font-semibold text-slate-700 bg-slate-200/60 px-2 py-0.5 rounded print:bg-transparent print:p-0">
+          <span className="text-xs sm:text-sm font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded print:bg-transparent print:p-0">
             {record.referenceNumber}
           </span>
         </div>
 
-        {/* TO / DELIVERY ADDRESS BLOCK */}
+        {/* TO / DELIVERY ADDRESS BLOCK (Without heading title) */}
         <div className="mb-6 pb-6 border-b-2 border-slate-300">
-          <div className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">
-            To / Delivery Address:
-          </div>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-2 break-words">
             {record.customerName}
           </h2>
@@ -98,12 +95,8 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({ record }) => {
           </div>
         </div>
 
-        {/* FROM / SENDER ADDRESS BLOCK */}
+        {/* FROM / SENDER ADDRESS BLOCK (Without heading title) */}
         <div>
-          <div className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">
-            From / Sender Address:
-          </div>
-
           {fromAddress ? (
             <div>
               <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mb-1.5 break-words">
@@ -123,7 +116,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({ record }) => {
               </div>
             </div>
           ) : (
-            <div className="p-4 bg-white/60 border border-dashed border-slate-300 rounded text-center">
+            <div className="p-4 bg-slate-50 border border-dashed border-slate-300 rounded text-center">
               <p className="text-xs sm:text-sm font-medium text-slate-600">
                 Sender address not set yet.
               </p>
