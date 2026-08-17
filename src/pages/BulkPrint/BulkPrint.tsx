@@ -199,27 +199,17 @@ export const BulkPrint: React.FC<BulkPrintProps> = ({ ids = [], onNavigate }) =>
                     className="border-2 border-slate-800 p-4 sm:p-5 rounded-md bg-white print-avoid-break flex flex-col justify-between"
                   >
                     <div>
-                      {/* Ref Tag Header */}
-                      <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-300">
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-slate-600 font-mono">
-                          Courier Slip
-                        </span>
-                        <span className="text-xs font-mono font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded">
-                          {record.referenceNumber}
-                        </span>
-                      </div>
-
                       {/* Delivery Address */}
-                      <div className="mb-4 pb-3 border-b border-slate-200">
-                        <h2 className="text-lg font-extrabold text-slate-900 leading-tight">
+                      <div className="mb-3 pb-3 border-b-2 border-slate-300">
+                        <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 leading-tight">
                           {record.customerName}
                         </h2>
-                        <div className="text-xs font-semibold text-slate-800 mt-1 space-y-0.5 leading-snug">
+                        <div className="text-xs sm:text-sm font-semibold text-slate-800 mt-1 space-y-0.5 leading-snug">
                           {deliveryAddressLines.map((line, idx) => (
                             <p key={idx}>{line}</p>
                           ))}
                         </div>
-                        <div className="mt-2 text-xs font-bold text-slate-900 font-mono">
+                        <div className="mt-2 text-xs sm:text-sm font-bold text-slate-900 font-mono">
                           Mobile: {record.mobileNumber}
                           {record.alternateMobile && <span className="ml-2">/ {record.alternateMobile}</span>}
                         </div>
@@ -228,15 +218,15 @@ export const BulkPrint: React.FC<BulkPrintProps> = ({ ids = [], onNavigate }) =>
                       {/* From Address */}
                       {fromAddress && (
                         <div>
-                          <h3 className="text-sm font-bold text-slate-900 leading-tight">
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
                             {fromAddress.name}
                           </h3>
-                          <div className="text-[11px] font-semibold text-slate-700 mt-0.5 leading-tight">
+                          <div className="text-xs sm:text-sm font-semibold text-slate-800 mt-0.5 leading-tight">
                             <p>{fromAddress.addressLine1}</p>
                             {fromAddress.addressLine2 && <p>{fromAddress.addressLine2}</p>}
                             <p>{[fromAddress.city, fromAddress.state, fromAddress.pinCode].filter(Boolean).join(' – ')}</p>
                           </div>
-                          <div className="mt-1 text-[11px] font-bold text-slate-900 font-mono">
+                          <div className="mt-1.5 text-xs sm:text-sm font-bold text-slate-900 font-mono">
                             Mobile: {fromAddress.mobileNumber}
                           </div>
                         </div>

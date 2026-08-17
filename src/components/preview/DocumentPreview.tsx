@@ -44,31 +44,21 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     return (
       <div
         key={`${rec.id || 'rec'}-${slotIndex}`}
-        className="bg-white text-slate-950 border border-slate-300 shadow-md sm:shadow-lg mx-auto p-3.5 sm:p-5 max-w-2xl rounded-lg sm:rounded-md print:max-w-none print:shadow-none print:border-slate-800 print:border-2 print:p-4 print:bg-white font-sans print-avoid-break mb-3 last:mb-0"
+        className="bg-white text-slate-950 border border-slate-300 shadow-md sm:shadow-lg mx-auto p-4 sm:p-6 max-w-2xl rounded-lg sm:rounded-md print:max-w-none print:shadow-none print:border-slate-800 print:border-2 print:p-5 print:bg-white font-sans print-avoid-break mb-3 last:mb-0"
       >
-        {/* Ref Tag top right */}
-        <div className="flex flex-row justify-between items-center mb-2 pb-1.5 border-b border-slate-200 print:border-slate-300">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
-            Courier Shipping Label (Slot {slotIndex})
-          </span>
-          <span className="text-xs font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded print:bg-transparent print:p-0">
-            {rec.referenceNumber}
-          </span>
-        </div>
-
         {/* TO / DELIVERY ADDRESS BLOCK */}
         <div className="mb-3 pb-3 border-b-2 border-slate-300">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mb-1 break-words">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-1 break-words">
             {rec.customerName}
           </h2>
 
-          <div className="text-xs sm:text-sm font-semibold text-slate-800 space-y-0.5 leading-snug break-words">
+          <div className="text-sm sm:text-base font-semibold text-slate-800 space-y-0.5 leading-snug break-words">
             {deliveryAddressLines.map((line, idx) => (
               <p key={idx}>{line}</p>
             ))}
           </div>
 
-          <div className="mt-2 text-xs sm:text-sm font-bold text-slate-900 font-mono break-all">
+          <div className="mt-2.5 text-sm sm:text-base font-bold text-slate-900 font-mono break-all">
             Mobile: {rec.mobileNumber}
             {rec.alternateMobile && <span className="block sm:inline sm:ml-3">/ {rec.alternateMobile}</span>}
           </div>
@@ -78,10 +68,10 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         <div>
           {fromAddress ? (
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight mb-0.5 break-words">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mb-0.5 break-words">
                 {fromAddress.name}
               </h3>
-              <div className="text-xs sm:text-sm font-semibold text-slate-800 space-y-0.5 leading-snug break-words">
+              <div className="text-sm sm:text-base font-semibold text-slate-800 space-y-0.5 leading-snug break-words">
                 <p>{fromAddress.addressLine1}</p>
                 {fromAddress.addressLine2 && <p>{fromAddress.addressLine2}</p>}
                 <p>
@@ -90,7 +80,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                     .join(' – ')}
                 </p>
               </div>
-              <div className="mt-1.5 text-xs sm:text-sm font-bold text-slate-900 font-mono break-all">
+              <div className="mt-2 text-sm sm:text-base font-bold text-slate-900 font-mono break-all">
                 Mobile: {fromAddress.mobileNumber}
               </div>
             </div>
@@ -105,7 +95,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 
         {/* Remarks / Delivery Note if any */}
         {rec.remarks && (
-          <div className="mt-2.5 pt-2 border-t border-slate-200 text-[11px] font-semibold text-slate-700 italic break-words">
+          <div className="mt-3 pt-2 border-t border-slate-200 text-xs font-semibold text-slate-700 italic break-words">
             Note: {rec.remarks}
           </div>
         )}
@@ -140,7 +130,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         </Button>
       </div>
 
-      {/* Main Printable Document Sheet Container - 3 Labels on 1 A4 Page */}
+      {/* Main Printable Document Sheet Container */}
       <div
         id="printable-document"
         className="max-w-2xl mx-auto space-y-3 print:space-y-2 print:max-w-none print:p-0 print:m-0"
