@@ -3,13 +3,14 @@ import { AddressRecord } from '../../types/address.types';
 import { formatDate } from '../../utils/date.utils';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { Eye, Printer, Edit2 } from 'lucide-react';
+import { Eye, Printer, Edit2, Share2 } from 'lucide-react';
 
 interface RecentFormsListProps {
   forms: AddressRecord[];
   onView: (id: number) => void;
   onEdit: (id: number) => void;
   onPrint: (record: AddressRecord) => void;
+  onShare?: (record: AddressRecord) => void;
   onViewAll?: () => void;
 }
 
@@ -18,6 +19,7 @@ export const RecentFormsList: React.FC<RecentFormsListProps> = ({
   onView,
   onEdit,
   onPrint,
+  onShare,
   onViewAll,
 }) => {
   if (forms.length === 0) {
@@ -78,6 +80,17 @@ export const RecentFormsList: React.FC<RecentFormsListProps> = ({
                     >
                       Edit
                     </Button>
+                    {onShare && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onShare(form)}
+                        icon={<Share2 className="w-3.5 h-3.5" />}
+                        title="Share Address"
+                      >
+                        Share
+                      </Button>
+                    )}
                     <Button
                       variant="primary"
                       size="sm"
@@ -110,6 +123,16 @@ export const RecentFormsList: React.FC<RecentFormsListProps> = ({
               <Button variant="outline" size="sm" onClick={() => onView(form.id!)}>
                 View
               </Button>
+              {onShare && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onShare(form)}
+                  icon={<Share2 className="w-3.5 h-3.5" />}
+                >
+                  Share
+                </Button>
+              )}
               <Button variant="primary" size="sm" onClick={() => onPrint(form)}>
                 Print
               </Button>

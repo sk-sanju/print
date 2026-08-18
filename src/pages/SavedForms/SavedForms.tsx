@@ -6,7 +6,8 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { formatDate } from '../../utils/date.utils';
-import { Search, Eye, Edit2, Printer, Trash2, ArrowLeft, PlusCircle, AlertTriangle, ChevronLeft, ChevronRight, CheckSquare, Square, Layers } from 'lucide-react';
+import { Search, Eye, Edit2, Printer, Trash2, ArrowLeft, PlusCircle, AlertTriangle, ChevronLeft, ChevronRight, CheckSquare, Square, Layers, Share2 } from 'lucide-react';
+import { ShareModal } from '../../components/share/ShareModal';
 
 interface SavedFormsProps {
   onNavigate: (route: string, params?: Record<string, any>) => void;
@@ -34,6 +35,9 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
   // Delete modal state
   const [deletingRecord, setDeletingRecord] = useState<AddressRecord | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  // Share modal state
+  const [sharingRecord, setSharingRecord] = useState<AddressRecord | null>(null);
 
   const fetchForms = useCallback(async () => {
     setIsLoading(true);
@@ -293,6 +297,15 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
                               Edit
                             </Button>
                             <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSharingRecord(record)}
+                              icon={<Share2 className="w-3.5 h-3.5" />}
+                              title="Share"
+                            >
+                              Share
+                            </Button>
+                            <Button
                               variant="secondary"
                               size="sm"
                               onClick={() => onNavigate('preview', { id: record.id, autoPrint: true })}
@@ -369,6 +382,14 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
                         icon={<Edit2 className="w-3.5 h-3.5" />}
                       >
                         Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSharingRecord(record)}
+                        icon={<Share2 className="w-3.5 h-3.5" />}
+                      >
+                        Share
                       </Button>
                       <Button
                         variant="secondary"
@@ -464,6 +485,13 @@ export const SavedForms: React.FC<SavedFormsProps> = ({ onNavigate }) => {
           </div>
         )}
       </Modal>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={Boolean(sharingRecord)}
+        onClose={() => setSharingRecord(null)}
+        record={sharingRecord}
+      />
     </div>
   );
 };

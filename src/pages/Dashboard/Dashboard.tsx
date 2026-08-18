@@ -4,6 +4,7 @@ import { AddressRecord } from '../../types/address.types';
 import { RecentFormsList } from '../../components/recent-forms/RecentFormsList';
 import { PWAInstallBanner } from '../../components/pwa/PWAInstallBanner';
 import { PWAInstallModal } from '../../components/pwa/PWAInstallModal';
+import { ShareModal } from '../../components/share/ShareModal';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { PlusCircle, FileText, Calendar, HardDrive, Wifi, Download, Sparkles, CheckCircle2 } from 'lucide-react';
@@ -27,6 +28,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPwaModalOpen, setIsPwaModalOpen] = useState<boolean>(false);
+  const [sharingRecord, setSharingRecord] = useState<AddressRecord | null>(null);
   const { isOnline } = useNetworkStatus();
   const { isInstalled } = usePWAInstall();
 
@@ -195,6 +197,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           onView={(id) => onNavigate('preview', { id })}
           onEdit={(id) => onNavigate('new-form', { id })}
           onPrint={handleQuickPrint}
+          onShare={(rec) => setSharingRecord(rec)}
           onViewAll={() => onNavigate('saved-forms')}
         />
       </Card>
@@ -203,6 +206,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       <PWAInstallModal
         isOpen={isPwaModalOpen}
         onClose={() => setIsPwaModalOpen(false)}
+      />
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={Boolean(sharingRecord)}
+        onClose={() => setSharingRecord(null)}
+        record={sharingRecord}
       />
     </div>
   );

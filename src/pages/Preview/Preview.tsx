@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { FormService } from '../../services/form.service';
 import { AddressRecord } from '../../types/address.types';
 import { DocumentPreview } from '../../components/preview/DocumentPreview';
+import { ShareModal } from '../../components/share/ShareModal';
 import { PrintService } from '../../services/print.service';
 import { Button } from '../../components/ui/Button';
-import { Printer, Edit2, ArrowLeft, PlusCircle, CheckCircle2, Layers, Copy } from 'lucide-react';
+import { Printer, Edit2, ArrowLeft, PlusCircle, CheckCircle2, Layers, Copy, Share2 } from 'lucide-react';
 
 interface PreviewProps {
   id?: number;
@@ -19,6 +20,7 @@ export const Preview: React.FC<PreviewProps> = ({ id, refNo, autoPrint = false, 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPrinting, setIsPrinting] = useState<boolean>(false);
   const [printedNotice, setPrintedNotice] = useState<boolean>(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
 
   // Slot position on A4 page: 1 (Top), 2 (Middle), 3 (Bottom)
   const [slotPosition, setSlotPosition] = useState<1 | 2 | 3>(1);
@@ -123,6 +125,16 @@ export const Preview: React.FC<PreviewProps> = ({ id, refNo, autoPrint = false, 
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsShareModalOpen(true)}
+            icon={<Share2 className="w-4 h-4 text-indigo-400" />}
+            className="bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 font-semibold"
+          >
+            Share Print
+          </Button>
+
           <Button
             variant="outline"
             size="sm"
@@ -283,6 +295,13 @@ export const Preview: React.FC<PreviewProps> = ({ id, refNo, autoPrint = false, 
         record={record}
         slotPosition={slotPosition}
         additionalRecords={[slot2Record, slot3Record].filter(Boolean)}
+      />
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        record={record}
       />
     </div>
   );
